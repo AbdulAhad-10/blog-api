@@ -1,29 +1,23 @@
-import { Router } from 'express';
+import { Router } from "express";
+import authorize from "../middleware/auth.middleware.js";
+import {
+  createBlog,
+  deleteBlog,
+  getAllBlogs,
+  getBlogById,
+  updateBlog,
+} from "../controllers/blog.controller.js";
 
 const blogRouter = Router();
 
-blogRouter.get("/", (req, res) => {
-    res.send("Get all blog posts");
-})
+blogRouter.get("/", getAllBlogs);
 
-blogRouter.post("/", (req, res) => {
-    res.send("Create a new blog post");
-})
+blogRouter.post("/", authorize, createBlog);
 
-blogRouter.get("/:id", (req, res) => {
-    const { id } = req.params;
-    res.send(`Get blog post with ID: ${id}`);
-})
+blogRouter.get("/:id", getBlogById);
 
-blogRouter.patch("/:id", (req, res) => {
-    const { id } = req.params;
-    res.send(`Update blog post with ID: ${id}`);
-})
+blogRouter.patch("/:id", authorize, updateBlog);
 
-blogRouter.delete("/:id", (req, res) => {
-    const { id } = req.params;
-    res.send(`Delete blog post with ID: ${id}`);
-}
-)
+blogRouter.delete("/:id", authorize, deleteBlog);
 
 export default blogRouter;

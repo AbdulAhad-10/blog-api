@@ -32,7 +32,6 @@ export const getAllBlogs = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: "Blogs retrieved successfully",
       data: {
         blogs,
         pagination: {
@@ -44,6 +43,92 @@ export const getAllBlogs = async (req, res, next) => {
           limit: parseInt(limit),
         },
       },
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const getBlogById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const blog = await Blog.findById(id)
+      .populate("author", "name email")
+      .select("-__v");
+
+    if (!blog) {
+      const error = new Error("Blog not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    res.status(200).json({
+      success: true,
+      data: blog,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const createBlog = async (req, res, next) => {
+  try {
+    const blog = await Blog.create({
+      ...req.body,
+      author: req.user._id,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Blog created successfully",
+      data: blog,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const updateBlog = async (req, res, next) => {
+  try {
+    const blog = await Blog.findByIdAndUpdate(
+      { _id: req.params.id, author: req.user._id },
+      req.body,
+      { new: true, runValidators: true }
+    );
+
+    if (!blog) {
+      const error = new Error("Blog not found or unauthorized");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Blog updated successfully",
+      data: blog,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const deleteBlog = async (req, res, next) => {
+  try {
+    const blog = await Blog.findOneAndDelete({
+      _id: req.params.id,
+      author: req.user._id,
+    });
+
+    if (!blog) {
+      const error = new Error("Blog not found or unauthorized");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Blog deleted successfully",
     });
   } catch (error) {
     return next(error);
