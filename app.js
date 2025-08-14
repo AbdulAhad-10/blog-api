@@ -39,10 +39,20 @@ import userRouter from "./routes/user.routes.js";
 import connectToDatabase from "./database/mongodb.js";
 import errorMiddleware from "./middleware/error.middleware.js";
 import arcjetMiddleware from "./middleware/arcjet.middleware.js";
+import cors from "cors";
 
 const app = express();
 
 await connectToDatabase();
+
+app.use(cors({
+  origin: [
+    "http://localhost:3000", 
+  ],
+  credentials: true, 
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
